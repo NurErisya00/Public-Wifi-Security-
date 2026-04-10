@@ -1,0 +1,260 @@
+{% extends "base_owner.html" %}
+{% block content %}
+
+<section class="dashboard-hero">
+  <div class="dashboard-hero-left">
+    <div class="hero-chip">
+      <span class="chip-text-logo">IS</span>
+      <span>Inside Scoop Cafe Network Monitoring</span>
+    </div>
+
+    <h1>PubWiSec Security Dashboard</h1>
+    <p>
+      Security monitoring and awareness system for public Wi-Fi environment at Inside Scoop cafe.
+    </p>
+
+    <div class="hero-inline-actions">
+      <form action="{{ url_for('rotate') }}" method="post" style="margin:0;">
+        <button class="hero-action-btn hero-action-primary" type="submit">Rotate Password</button>
+      </form>
+
+      <a href="{{ url_for('alerts') }}" class="hero-action-btn hero-action-secondary">View Alerts</a>
+      <a href="{{ url_for('password_history') }}" class="hero-action-btn hero-action-light">Password History</a>
+    </div>
+  </div>
+
+  <div class="dashboard-hero-right">
+    <div class="ssid-display-card">
+      <div class="ssid-display-label">Official SSID</div>
+      <div class="ssid-display-value">{{ current_ssid }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-strip">
+  <div class="stat-pill">
+    <div class="stat-label">Wi-Fi Password Age</div>
+    <div class="stat-value">{{ days_since }} Days</div>
+  </div>
+
+  <div class="stat-pill">
+    <div class="stat-label">Current SSID</div>
+    <div class="stat-value">{{ current_ssid }}</div>
+  </div>
+
+  <div class="stat-pill">
+    <div class="stat-label">System Status</div>
+    <div class="stat-value">
+      {% if system_status == "SAFE" %}
+        <span class="status-pill status-safe">SAFE</span>
+      {% elif system_status == "WARNING" %}
+        <span class="status-pill status-warning">WARNING</span>
+      {% else %}
+        <span class="status-pill status-critical">CRITICAL</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="stat-pill">
+    <div class="stat-label">Last Security Scan</div>
+    <div class="stat-value small-value">{{ scan_time }}</div>
+  </div>
+</section>
+
+<section class="dashboard-main-grid">
+
+  <div class="main-graph-panel">
+    <div class="panel-top-row">
+      <div>
+        <h2>Security Status Trend</h2>
+        <p>This graph uses real alert data from the PubWiSec database.</p>
+      </div>
+      <div class="scale-note">SAFE = 1 • WARNING = 2 • CRITICAL = 3</div>
+    </div>
+
+    <div style="padding: 0 22px 12px 22px;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="{{ url_for('dashboard', days=7) }}"
+           class="{% if selected_days == 7 %}range-btn-active{% else %}range-btn{% endif %}">
+          7 Days
+        </a>
+
+        <a href="{{ url_for('dashboard', days=14) }}"
+           class="{% if selected_days == 14 %}range-btn-active{% else %}range-btn{% endif %}">
+          14 Days
+        </a>
+
+        <a href="{{ url_for('dashboard', days=30) }}"
+           class="{% if selected_days == 30 %}range-btn-active{% else %}range-btn{% endif %}">
+          30 Days
+        </a>
+      </div>
+    </div>
+
+    <div
+      id="chart-data"
+      data-labels='{{ graph_labels | tojson | safe }}'
+      data-values='{{ graph_values | tojson | safe }}'
+      style="display:none;"
+    ></div>
+
+    <div style="height: 460px; padding: 10px 20px 0 20px;">
+      <canvas id="securityStatusChart"></canvas>
+    </div>
+
+    <div class="graph-footer-note">
+      System status is calculated based on security alerts detected within the last 24 hours.
+    </div>
+  </div>
+
+  <div class="alerts-side-panel">
+    <div class="alerts-side-header">
+      <h2>Recent Alerts</h2>
+      <a href="{{ url_for('alerts') }}">Open All</a>
+    </div>
+
+    <div class="alerts-stack">
+      {% for a in recent_alerts %}
+        <div class="modern-alert-card">
+          <div class="modern-alert-top">
+            <div class="modern-alert-type">{{ a.type }}</div>
+
+            {% if a.severity == "HIGH" or a.severity == "CRITICAL" %}
+              <span class="modern-alert-badge high">{{ a.severity }}</span>
+            {% elif a.severity == "WARNING" %}
+              <span class="modern-alert-badge warning">{{ a.severity }}</span>
+            {% else %}
+              <span class="modern-alert-badge info">{{ a.severity }}</span>
+            {% endif %}
+          </div>
+
+          <div class="modern-alert-time">{{ a.when }}</div>
+          <div class="modern-alert-message">{{ a.message }}</div>
+        </div>
+      {% else %}
+        <div class="empty-alert-state">No alerts yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const chartDataElement = document.getElementById('chart-data');
+  const graphLabels = JSON.parse(chartDataElement.dataset.labels);
+  const graphValues = JSON.parse(chartDataElement.dataset.values);
+
+  const barColors = graphValues.map(value => {
+    if (value === 1) return '#9fcd63';   // SAFE
+    if (value === 2) return '#f2d35b';   // WARNING
+    return '#e37b7b';                    // CRITICAL
+  });
+
+  const borderColors = graphValues.map(value => {
+    if (value === 1) return '#7fa54f';
+    if (value === 2) return '#d8b63f';
+    return '#cc5f5f';
+  });
+
+  const ctx = document.getElementById('securityStatusChart').getContext('2d');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: graphLabels,
+      datasets: [{
+        label: 'Daily Status',
+        data: graphValues,
+        backgroundColor: barColors,
+        borderColor: borderColors,
+        borderWidth: 2,
+        borderRadius: 10,
+        barThickness: 36
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 10,
+          right: 10,
+          bottom: 0,
+          left: 0
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              if (context.raw === 1) return 'SAFE';
+              if (context.raw === 2) return 'WARNING';
+              if (context.raw === 3) return 'CRITICAL';
+              return context.raw;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0,
+          max: 3,
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            callback: function(value) {
+              if (value === 1) return 'SAFE';
+              if (value === 2) return 'WARNING';
+              if (value === 3) return 'CRITICAL';
+              return '';
+            },
+            font: {
+              size: 13,
+              weight: 'bold'
+            },
+            padding: 8
+          },
+          title: {
+            display: true,
+            text: 'Security Level',
+            font: {
+              size: 13,
+              weight: 'bold'
+            }
+          },
+          grid: {
+            color: '#eee8d6'
+          }
+        },
+        x: {
+          ticks: {
+            autoSkip: true,
+            maxRotation: 45,
+            minRotation: 45,
+            font: {
+              size: 12
+            }
+          },
+          title: {
+            display: true,
+            text: 'Day',
+            font: {
+              size: 13,
+              weight: 'bold'
+            }
+          },
+          grid: {
+            display: false
+          }
+        }
+      }
+    }
+  });
+</script>
+
+{% endblock %}

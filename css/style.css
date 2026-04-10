@@ -1,0 +1,123 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #f4f6f9, #e9eef5);
+}
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #1f6fa6, #0e5a8a);
+  padding: 25px 15px;
+  color: white;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  margin-bottom: 8px;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.content {
+  flex: 1;
+  padding: 40px;
+}
+
+.cards {
+  display: flex;
+  gap: 25px;
+}
+
+.card {
+  flex: 1;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+}
+
+.status {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.safe { background: #4caf50; color: white; }
+.warning { background: #fbc02d; color: black; }
+.critical { background: #e53935; color: white; }
+
+.panel {
+  margin-top: 35px;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.panel h2 {
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-green {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-blue {
+  background: #1f6fa6;
+  color: white;
+}
+
+.btn-gray {
+  background: #9e9e9e;
+  color: white;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.actions {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+}

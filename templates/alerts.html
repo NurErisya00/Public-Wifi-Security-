@@ -1,0 +1,68 @@
+{% extends "base_owner.html" %}
+{% block content %}
+
+<section class="dashboard-hero" style="padding:24px 28px;">
+  <div class="dashboard-hero-left">
+    <div class="hero-chip">
+      <span class="chip-text-logo">IS</span>
+      <span>Inside Scoop Security Events</span>
+    </div>
+
+    <h1 style="font-size:42px;">Alerts & Security Events</h1>
+    <p>
+      Monitor detected threats, suspicious activities, simulated attack events, and system alerts for the cafe public Wi-Fi environment.
+    </p>
+
+    <div class="hero-inline-actions">
+      <a href="{{ url_for('simulate_mitm') }}" class="hero-action-btn hero-action-secondary">Simulate MITM</a>
+      <a href="{{ url_for('simulate_rogue') }}" class="hero-action-btn hero-action-secondary">Simulate Rogue AP</a>
+      <a href="{{ url_for('scan_wifi_route') }}" class="hero-action-btn hero-action-primary">Scan Nearby Wi-Fi</a>
+      <a href="{{ url_for('acknowledge_all') }}" class="hero-action-btn hero-action-light">Acknowledge</a>
+      <a href="{{ url_for('export_alerts') }}" class="hero-action-btn hero-action-light">Export CSV</a>
+    </div>
+  </div>
+</section>
+
+<section class="main-graph-panel" style="margin-top:18px;">
+  <div class="alerts-side-header">
+    <h2>Recent Alert Records</h2>
+    <span style="font-size:14px; color:#7a7362; font-weight:700;">Latest 50 alerts</span>
+  </div>
+
+  <div style="padding:18px 20px 22px 20px; overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; min-width:900px;">
+      <thead>
+        <tr style="background:#fffaf0;">
+          <th style="text-align:left; padding:14px 12px; font-size:14px; color:#6f6756; border-bottom:1px solid #ece2bf;">Date/Time</th>
+          <th style="text-align:left; padding:14px 12px; font-size:14px; color:#6f6756; border-bottom:1px solid #ece2bf;">Type</th>
+          <th style="text-align:left; padding:14px 12px; font-size:14px; color:#6f6756; border-bottom:1px solid #ece2bf;">Severity</th>
+          <th style="text-align:left; padding:14px 12px; font-size:14px; color:#6f6756; border-bottom:1px solid #ece2bf;">Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in alerts %}
+        <tr style="border-bottom:1px solid #f2ecd8;">
+          <td style="padding:16px 12px; font-size:14px; color:#4f4a3f;">{{ a.created_at }}</td>
+          <td style="padding:16px 12px; font-size:15px; font-weight:800; color:#2f2f2f;">{{ a.alert_type }}</td>
+          <td style="padding:16px 12px;">
+            {% if a.severity == "HIGH" or a.severity == "CRITICAL" %}
+              <span class="modern-alert-badge high">{{ a.severity }}</span>
+            {% elif a.severity == "WARNING" %}
+              <span class="modern-alert-badge warning">{{ a.severity }}</span>
+            {% else %}
+              <span class="modern-alert-badge info">{{ a.severity }}</span>
+            {% endif %}
+          </td>
+          <td style="padding:16px 12px; font-size:14px; line-height:1.6; color:#2f2f2f;">{{ a.message }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" style="padding:20px 12px; color:#7a7362;">No alerts found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title or "PubWiSec Login" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pubwisec.css') }}">
+</head>
+<body class="login-page-body">
+
+  <div class="login-shell">
+    <div class="login-showcase">
+      <div class="login-showcase-inner">
+        <div class="login-brand-chip">
+          <span class="chip-text-logo">IS</span>
+          <span>Inside Scoop</span>
+        </div>
+
+        <h1>PubWiSec</h1>
+        <p>
+          Public Wi-Fi Security Monitoring System designed for Inside Scoop cafe environment.
+        </p>
+
+        <div class="showcase-points">
+          <div class="showcase-point">Wi-Fi password rotation monitoring</div>
+          <div class="showcase-point">Threat alert visibility</div>
+          <div class="showcase-point">Customer advisory awareness</div>
+          <div class="showcase-point">Dashboard-based cafe security overview</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-form-side">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% extends "base_login.html" %}
+{% block content %}
+
+<div class="login-card-modern">
+
+  <div class="login-card-top">
+    <div class="login-mini-pill">INSIDE SCOOP</div>
+    <div class="login-heading">PubWiSec</div>
+    <p class="login-description">Secure Wi-Fi Monitoring for Inside Scoop Cafe</p>
+  </div>
+
+  <form class="login-form" method="POST" action="{{ url_for('login') }}" autocomplete="off">
+
+    <div class="input-group">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="Owner username" required autocomplete="off">
+    </div>
+
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+    </div>
+
+    <button class="login-submit-btn" type="submit">Login</button>
+
+    {% if error %}
+      <div class="login-error-box">{{ error }}</div>
+    {% endif %}
+
+  </form>
+
+  <div class="login-bottom-note">© 2026 PubWiSec • Inside Scoop Cafe Wi-Fi Security</div>
+
+</div>
+
+{% endblock %}
